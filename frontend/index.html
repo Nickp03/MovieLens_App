@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieLens Explorer</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <header>
+        <h1>MovieLens Explorer</h1>
+        <p>Explore datasets, rate movies, and get recommendations!</p>
+    </header>
+
+    <main>
+        <section id="add-movie-section">
+            <h2>Add a New Movie</h2>
+            <form id="add-movie-form">
+                <input type="text" id="movie-title" placeholder="Movie Title (e.g., Matrix, The (1999))" required>
+                <input type="text" id="movie-genres" placeholder="Genres (e.g., Action|Sci-Fi)" required>
+                <button type="submit">Add Movie</button>
+            </form>
+            <div id="add-movie-message"></div>
+        </section>
+
+        <section id="search-section">
+            <h2>Search Movies</h2>
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Enter keyword (e.g., Toy)">
+                <button id="search-btn">Search</button>
+            </div>
+            
+            <div id="search-results">
+                </div>
+        </section>
+
+        <section id="recommendations-section">
+            <h2>Personalized Recommendations</h2>
+            <p>Rate some movies above, then click below to get personalized suggestions based on your taste!</p>
+            <button id="get-recommendations-btn">Get Recommendations</button>
+            <div id="recommendations-results">
+                </div>
+        </section>
+    </main>
+
+    <script src="index.js"></script>
+</body>
+</html>
