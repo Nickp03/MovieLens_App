@@ -1,34 +1,39 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Times New Roman', Times, serif, sans-serif;
+    /* Μηδενίζουμε τα κενά στις άκρες της οθόνης */
     margin: 0;
     padding: 0;
     background-color: #f4f4f9;
-    color: #333;
+    color: #000000;
+}
+
+main {
+    /* Δεν αφήνουμε το περιεχόμενο να απλωθεί πάνω από 900 pixel */
+    max-width: 900px;
+    /* Κεντράρουμε αυτόματα όλο το site στη μέση της οθόνης */
+    margin: 2rem auto;
 }
 
 header {
     background-color: #2c3e50;
     color: white;
     padding: 1.5rem;
+    /* Κεντράρουμε τον τίτλο */
     text-align: center;
-}
-
-main {
-    max-width: 900px;
-    margin: 2rem auto;
-    padding: 0 1rem;
 }
 
 section {
     background: white;
     padding: 1.5rem;
+    /* Δίνουμε απόσταση μεταξύ των καρτελών */
     margin-bottom: 2rem;
+    /* Στρογγυλεύουμε τις γωνίες των καρτελών */
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 h2 {
-    border-bottom: 2px solid #3498db;
+    border-bottom: 2px solid #b60000;
     padding-bottom: 0.5rem;
     margin-top: 0;
 }
@@ -36,36 +41,46 @@ h2 {
 input[type="text"] {
     padding: 0.5rem;
     margin-right: 0.5rem;
+    /* Περίγραμμα στα κουτάκια που γράφουμε */
     border: 1px solid #ccc;
     border-radius: 4px;
+    /* Σταθερό πλάτος για να είναι ευανάγνωστα */
     width: 250px;
 }
 
 button {
     padding: 0.5rem 1rem;
+    /* Χρώμα στα κουμπιά */
     background-color: #3498db;
     color: white;
+    /* Αφαιρούμε το προεπιλεγμένο περίγραμμα του browser */
     border: none;
     border-radius: 4px;
+    /* Κάνουμε το βέλος του ποντικιού να γίνεται "χεράκι", δείχνοντας ότι πατιέται */
     cursor: pointer;
 }
 
 button:hover {
+    /* Όταν ακουμπάμε το ποντίκι πάνω στο κουμπί, το γαλάζιο σκουραίνει, δίνοντας την αίσθηση ότι το κουμπί αντιδρά */
     background-color: #2980b9;
 }
 
 /* Στυλ για τον πίνακα αποτελεσμάτων */
 table {
     width: 100%;
+    /* Ενώνουμε τα διπλά περιγράμματα των κελιών σε μονά */
     border-collapse: collapse;
     margin-top: 1rem;
 }
 
-table, th, td {
+table,
+th,
+td {
     border: 1px solid #ddd;
 }
 
-th, td {
+th,
+td {
     padding: 0.8rem;
     text-align: left;
 }
@@ -74,5 +89,14 @@ th {
     background-color: #f2f2f2;
 }
 
-.success { color: green; margin-top: 0.5rem; }
-.error { color: red; margin-top: 0.5rem; }
+.success {
+    /* Αν η ταινία προστεθεί επιτυχώς, το μήνυμα γίνεται πράσινο */
+    color: green;
+    margin-top: 0.5rem;
+}
+
+.error {
+    /* Αν αποτύχει η σύνδεση, το μήνυμα γίνεται κόκκινο */
+    color: red;
+    margin-top: 0.5rem;
+}

@@ -4,6 +4,7 @@
 Μια Full-stack εφαρμογή για την αναζήτηση ταινιών και την παροχή εξατομικευμένων συστάσεων με βάση τον αλγόριθμο Collaborative Filtering (Pearson Correlation).
 
 ## Οδηγίες Εγκατάστασης & Εκτέλεσης
+source venv/bin/activate
 1. Τοποθετήστε τα αρχεία `movies.csv` και `ratings.csv` στον φάκελο `backend/`.
 2. Εκτελέστε το script αρχικοποίησης της βάσης:
    `python setup_db.py`

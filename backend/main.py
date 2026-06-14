@@ -35,7 +35,7 @@ class RecommendationRequest(BaseModel):
 
 # --- API 1: Αναζήτηση Ταινιών (GET) ---
 @app.get("/movielens/api/movies")
-def search_movies(search: str):
+async def search_movies(search: str):
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM movies WHERE title LIKE ?", ('%' + search + '%',))
@@ -49,7 +49,7 @@ def search_movies(search: str):
 
 # --- API 2: Λήψη Βαθμολογιών (GET) ---
 @app.get("/movielens/api/ratings/{movieId}")
-def get_ratings(movieId: int):
+async def get_ratings(movieId: int):
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT userId, rating, timestamp FROM ratings WHERE movieId = ?", (movieId,))
@@ -63,7 +63,7 @@ def get_ratings(movieId: int):
 
 # --- API 3: Προσθήκη Νέας Ταινίας (POST) ---
 @app.post("/movielens/api/movies")
-def add_movie(movie: MovieCreate):
+async def add_movie(movie: MovieCreate):
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -82,7 +82,7 @@ def add_movie(movie: MovieCreate):
 
 # --- API 4: Συστάσεις / Recommendations (POST) ---
 @app.post("/movielens/api/recommendations")
-def get_recommendations(req: RecommendationRequest):
+async def get_recommendations(req: RecommendationRequest):
     user_ratings = {r.movieId: r.rating for r in req.ratings}
     if not user_ratings:
         return {"status": "success", "recommendations": []}

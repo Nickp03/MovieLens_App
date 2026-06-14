@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieLens Explorer</title>
     <link rel="stylesheet" href="index.css">
 </head>
+
 <body>
     <header>
         <h1>MovieLens Explorer</h1>
@@ -15,34 +16,37 @@
     <main>
         <section id="add-movie-section">
             <h2>Add a New Movie</h2>
-            <form id="add-movie-form">
-                <input type="text" id="movie-title" placeholder="Movie Title (e.g., Matrix, The (1999))" required>
-                <input type="text" id="movie-genres" placeholder="Genres (e.g., Action|Sci-Fi)" required>
-                <button type="submit">Add Movie</button>
+            <form id="add-movie-form"> <!-- Δύο πεδία εισαγωγής κειμένου -->
+                <!-- Τα πεδία έχουν το χαρακτηριστικό required, εμποδίζοντας τον χρήστη να στείλει κενά δεδομένα -->
+                <input type="text" id="movie-title" placeholder="Movie Title" required>
+                <input type="text" id="movie-genres" placeholder="Genres" required>
+                <button type="submit">Add</button>
             </form>
+            <!-- "Υποδοχέας" όπου η JavaScript θα εμφανίσει δυναμικά ένα μήνυμα επιτυχίας ή σφάλματος μετά την επικοινωνία με το backend -->
             <div id="add-movie-message"></div>
         </section>
 
         <section id="search-section">
             <h2>Search Movies</h2>
-            <div class="search-bar">
-                <input type="text" id="search-input" placeholder="Enter keyword (e.g., Toy)">
-                <button id="search-btn">Search</button>
-            </div>
-            
-            <div id="search-results">
-                </div>
+            <input type="text" id="search-input" placeholder="Enter keyword">
+            <button id="search-btn">Search</button>
+            <!-- Η JavaScript θα βάλει δυναμικά έναν πίνακα με τα αποτελέσματα που επιστρέφει η βάση δεδομένων, 
+            εμφανίζοντας τις ταινίες, τους μέσους όρους βαθμολογίας τους και τα textboxes για να τις βαθμολογήσει ο χρήστης -->
+            <div id="search-results"></div>
         </section>
 
         <section id="recommendations-section">
             <h2>Personalized Recommendations</h2>
-            <p>Rate some movies above, then click below to get personalized suggestions based on your taste!</p>
+            <p>Rate movies above, then click below to get suggestions!</p>
             <button id="get-recommendations-btn">Get Recommendations</button>
-            <div id="recommendations-results">
-                </div>
+            <!-- Θα υποδεχτεί τον τελικό πίνακα με τις προτεινόμενες ταινίες και τις προβλεπόμενες βαθμολογίες τους (Predicted Rating), 
+            μόλις ο αλγόριθμος Pearson του backend ολοκληρώσει τους υπολογισμούς του -->
+            <div id="recommendations-results"></div>
         </section>
     </main>
-
+    <!-- Ο browser θα φορτώσει και θα σχεδιάσει πρώτα όλο το οπτικό κομμάτι της σελίδας (HTML/CSS) χωρίς καθυστερήσεις,
+    και μετά θα "ζωντανέψει" τα κουμπιά και τις φόρμες μέσω του JavaScript -->
     <script src="index.js"></script>
 </body>
+
 </html>
