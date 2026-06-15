@@ -1,5 +1,5 @@
 // Η βασική διεύθυνση URL του FastAPI backend API για την επικοινωνία
-const API_BASE_URL = 'http://127.0.0.1:8000/movielens/api';
+const API_BASE_URL = 'http://127.0.0.1:3000/movielens/api';
 
 // Αντί για άδειο πίνακα, ελέγχουμε αν υπάρχουν ήδη αποθηκευμένες βαθμολογίες στο sessionStorage.
 // Επειδή το sessionStorage αποθηκεύει μόνο κείμενο (string), χρησιμοποιούμε JSON.parse για να το ξανακάνουμε πίνακα.
@@ -143,14 +143,22 @@ document.getElementById('search-btn').addEventListener('click', async () => {
             const ratingsResponse = await fetch(`${API_BASE_URL}/ratings/${movie.movieId}`);
             const ratingsData = await ratingsResponse.json();
 
+            // Δημιουργούμε ένα τοπικό αντίγραφο των βαθμολογιών
+            let allRatings = [...ratingsData.ratings];
+
+            // Ελέγχουμε αν ο χρήστης έχει βαθμολογήσει αυτή την ταινία σε αυτό το session
+            const sessionRating = userRatings.find(r => r.movieId === movie.movieId);
+            if (sessionRating) {
+                // Αν τη βαθμολόγησε, την προσθέτουμε "εικονικά" στον πίνακα για τον σωστό υπολογισμό
+                allRatings.push({ rating: sessionRating.rating });
+            }
+
             let avgRating = 'N/A'; // Προεπιλεγμένη τιμή αν η ταινία δεν έχει βαθμολογηθεί ποτέ
 
-            // Αν υπάρχουν βαθμολογίες στη βάση, υπολογίζουμε τον μέσο όρο
-            if (ratingsData.ratings.length > 0) {
-                // Χρήση της .reduce() για το άθροισμα όλων των ratings της ταινίας
-                const sum = ratingsData.ratings.reduce((acc, curr) => acc + curr.rating, 0);
-                // Υπολογισμός μέσου όρου και στρογγυλοποίηση σε 2 δεκαδικά ψηφία
-                avgRating = (sum / ratingsData.ratings.length).toFixed(2);
+            // Υπολογισμός με βάση ενημερωμένο σύνολο βαθμολογιών
+            if (allRatings.length > 0) {
+                const sum = allRatings.reduce((acc, curr) => acc + curr.rating, 0);
+                avgRating = (sum / allRatings.length).toFixed(2);
             }
 
             // Δυναμική προσθήκη μιας γραμμής (row) στον πίνακα για κάθε ταινία
@@ -183,7 +191,7 @@ document.getElementById('search-btn').addEventListener('click', async () => {
 
 // Προσάρτηση της συνάρτησης στο καθολικό αντικείμενο 'window' 
 // για να είναι προσβάσιμη από τα inline 'onclick' attributes του δυναμικού πίνακα
-window.rateMovie = function (movieId) {
+window.rateMovie = async function (movieId) {
     // Λήψη της τιμής από το input πεδίο της συγκεκριμένης ταινίας
     const ratingInput = document.getElementById(`rate-${movieId}`).value;
     const rating = parseFloat(ratingInput); // Μετατροπή του κειμένου σε δεκαδικό αριθμό
@@ -207,6 +215,28 @@ window.rateMovie = function (movieId) {
 
     // Μετατρέπουμε τον πίνακα σε string και τον σώζουμε στο sessionStorage
     sessionStorage.setItem('userRatings', JSON.stringify(userRatings));
+
+    // Ζωντανή ανανέωση του μέσου όρου στην οθόνη χωρίς refresh!
+    try {
+        // Ξαναζητάμε τις βαθμολογίες της βάσης
+        const ratingsResponse = await fetch(`${API_BASE_URL}/ratings/${movieId}`);
+        const ratingsData = await ratingsResponse.json();
+
+        let allRatings = [...ratingsData.ratings];
+        allRatings.push({ rating: rating }); // Προσθέτουμε τη νέα/ανανεωμένη ψήφο μας
+
+        // Επανυπολογισμός
+        const sum = allRatings.reduce((acc, curr) => acc + curr.rating, 0);
+        const newAvg = (sum / allRatings.length).toFixed(2);
+
+        // Εύρεση του συγκεκριμένου κελιού στον πίνακα και ενημέρωση της τιμής του
+        const avgCell = document.getElementById(`avg-${movieId}`);
+        if (avgCell) {
+            avgCell.innerHTML = `<strong>${newAvg}</strong>`; // Το βάζουμε και με bold για να ξεχωρίζει η αλλαγή!
+        }
+    } catch (err) {
+        console.log("Could not dynamically update average rating in UI.");
+    }
 
     // Εμφάνιση μηνύματος επιβεβαίωσης στον χρήστη
     alert(`Rated movie ${movieId} with ${rating} stars!`);

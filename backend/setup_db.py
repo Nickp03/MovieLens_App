@@ -5,6 +5,9 @@ import os
 def create_database():
     # Δημιουργία ή σύνδεση με το αρχείο της βάσης δεδομένων SQLite
     db_path = 'movielens.db'
+    if os.path.exists(db_path):
+        os.remove(db_path)
+        print(f"Το παλιό αρχείο '{db_path}' εντοπίστηκε και διαγράφηκε για πλήρες reset.")
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
