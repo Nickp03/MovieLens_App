@@ -5,7 +5,7 @@ from typing import List, Dict
 # =========================================================================
 # ΡΥΘΜΙΣΕΙΣ ΑΛΓΟΡΙΘΜΟΥ (GLOBAL CONSTANTS)
 # =========================================================================
-TOP_K = 50 # Πλήθος πιο όμοιων χρηστών που θα εξεταστούν (Γειτονιά)
+TOP_K = 10 # Πλήθος πιο όμοιων χρηστών που θα εξεταστούν (Γειτονιά)
 TOP_N = 10 # Πλήθος ταινιών που θα επιστραφούν τελικά στο Frontend
 
 def get_pearson_recommendations(user_ratings: Dict[int, float], cursor: sqlite3.Cursor) -> List[dict]:
@@ -21,7 +21,6 @@ def get_pearson_recommendations(user_ratings: Dict[int, float], cursor: sqlite3.
     placeholders = ','.join('?' * len(user_ratings))
     cursor.execute(f"SELECT userId, movieId, rating FROM ratings WHERE movieId IN ({placeholders})", list(user_ratings.keys()))
     overlapping_ratings = cursor.fetchall()
-    
     users_v = {}
     for row in overlapping_ratings:
         uid, mid, rating = row['userId'], row['movieId'], row['rating']
@@ -32,9 +31,8 @@ def get_pearson_recommendations(user_ratings: Dict[int, float], cursor: sqlite3.
     # 2. Υπολογισμός ομοιότητας (Pearson Correlation)
     similarities = {}
     for v_id, v_ratings_dict in users_v.items():
+        print(f"User {v_id} ==> Rating {v_ratings_dict}")
         co_rated = set(user_ratings.keys()).intersection(v_ratings_dict.keys())
-        if len(co_rated) < 2: # Χρειάζονται τουλάχιστον 2 κοινές ταινίες
-            continue
             
         cursor.execute("SELECT AVG(rating) as avg_rating FROM ratings WHERE userId = ?", (v_id,))
         mean_v = cursor.fetchone()['avg_rating']
@@ -51,13 +49,13 @@ def get_pearson_recommendations(user_ratings: Dict[int, float], cursor: sqlite3.
         
         if den_u > 0 and den_v > 0:
             sim = num / (math.sqrt(den_u) * math.sqrt(den_v))
-            if sim > 0: # Κρατάμε μόνο θετικές συσχετίσεις
-                similarities[v_id] = (sim, mean_v)
+            print(f"[TEST] Χρήστης {v_id} -> Υπολογίστηκε sim = {sim}")
+            similarities[v_id] = (sim, mean_v)
     
     # 3. Επιλογή Top-K χρηστών
     top_k = sorted(similarities.items(), key=lambda x: x[1][0], reverse=True)[:TOP_K]
     if not top_k:
-         return []
+        return []
          
     top_k_users = {v_id: sim_data for v_id, sim_data in top_k}
     
@@ -97,14 +95,18 @@ def get_pearson_recommendations(user_ratings: Dict[int, float], cursor: sqlite3.
         cursor.execute(f"SELECT * FROM movies WHERE movieId IN ({placeholders_m})", movie_ids)
         movie_details = {row['movieId']: row for row in cursor.fetchall()}
         
-        for mid, pred in top_n_preds:
+        for mid, raw_pred in top_n_preds:
             if mid in movie_details:
                 m = movie_details[mid]
+                
+                # 3. CLIPPING: Εφαρμόζεται μόνο για την εμφάνιση της βαθμολογίας στο UI
+                display_rating = min(5.0, max(0.5, raw_pred))
+                
                 recommendations.append({
                     "movieId": mid,
                     "title": m["title"],
                     "genres": m["genres"],
-                    "predictedRating": round(pred, 2)
+                    "predictedRating": round(display_rating, 2)
                 })
                 
     return recommendations

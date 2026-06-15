@@ -46,8 +46,8 @@ document.getElementById('add-movie-form').addEventListener('submit', async (e) =
 
             document.getElementById('add-movie-form').reset(); // Καθαρισμός των πεδίων της φόρμας
         } else {
-            // Εμφάνιση κόκκινου μηνύματος σε περίπτωση αποτυχίας από το backend
-            messageDiv.innerHTML = `<p class="error">Error adding movie.</p>`;
+            // Εμφανίζουμε το δυναμικό μήνυμα που μας επέστρεψε το Backend!
+            messageDiv.innerHTML = `<p class="error">${data.message || 'Error adding movie.'}</p>`;
         }
     } catch (error) {
         // Διαχείριση σφαλμάτων σε περίπτωση που το backend είναι κλειστό ή δεν υπάρχει δίκτυο

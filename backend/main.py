@@ -65,12 +65,30 @@ async def get_ratings(movieId: int):
 # --- API 3: Προσθήκη Νέας Ταινίας (POST) ---
 @app.post("/movielens/api/movies")
 async def add_movie(movie: MovieCreate):
+    # ΕΛΕΓΧΟΣ ΕΓΚΥΡΟΤΗΤΑΣ (VALIDATION):
+    # Αν βρεθεί κόμμα, ερωτηματικό, ή αν υπάρχουν κενά ανάμεσα σε λέξεις ΧΩΡΙΣ να υπάρχει η κάθετος '|'
+    if ',' in movie.genres or ';' in movie.genres or (' ' in movie.genres.strip() and '|' not in movie.genres):
+        return {
+            "status": "error",
+            "message": "Invalid format! Please separate multiple genres using the vertical bar '|' (e.g., Action|Drama)."
+        }
+    
+    # Καθαρισμός τυχόν κενών γύρω από τις καθέτους (π.χ. "Action | Drama" -> "Action|Drama")
+    clean_genres = '|'.join([g.strip() for g in movie.genres.split('|') if g.strip()])
+    
+    # Αν το πεδίο έμεινε κενό ή περιείχε μόνο κενά/καθέτους
+    if not clean_genres:
+        return {
+            "status": "error",
+            "message": "Genres field cannot be empty. Please provide at least one valid genre."
+        }
+
     conn = get_db_connection()
     cursor = conn.cursor()
     
     cursor.execute(
         "INSERT INTO movies (title, genres) VALUES (?, ?)",
-        (movie.title, movie.genres)
+        (movie.title, clean_genres)
     )
     conn.commit()
     new_id = cursor.lastrowid # Παίρνουμε το νέο ID που δημιουργήθηκε αυτόματα
