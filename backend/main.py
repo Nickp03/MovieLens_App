@@ -140,7 +140,7 @@ async def get_movies_by_tag(req: TagSearchRequest):
             FROM movies m
             JOIN tags t ON m.movieId = t.movieId
             WHERE LOWER(t.tag) = ?
-            GROUP BY m.movieId
+            GROUP BY m.movieId,t.tag
         """
         cursor.execute(query, (keyword,))
     else:
@@ -151,7 +151,7 @@ async def get_movies_by_tag(req: TagSearchRequest):
             FROM movies m
             JOIN tags t ON m.movieId = t.movieId
             WHERE SUBSTR(LOWER(t.tag), 1, 5) = ?
-            GROUP BY m.movieId
+            GROUP BY m.movieId, t.tag
         """
         cursor.execute(query, (prefix,))
         
