@@ -303,3 +303,68 @@ document.getElementById('get-recommendations-btn').addEventListener('click', asy
         recsDiv.innerHTML = `<p class="error">Error fetching recommendations.</p>`;
     }
 });
+
+// ----------
+
+// ----------
+// ΛΕΙΤΟΥΡΓΙΚΟΤΗΤΑ 5: ΑΝΑΖΗΤΗΣΗ ΤΑΙΝΙΩΝ ΜΕ ΒΑΣΗ TAGS (POST REQUEST)
+// ----------
+
+document.getElementById('tag-search-btn').addEventListener('click', async () => {
+    const keyword = document.getElementById('tag-search-input').value;
+    const resultsDiv = document.getElementById('tag-search-results');
+
+    // Έλεγχος εγκυρότητας
+    if (!keyword) {
+        resultsDiv.innerHTML = '<p class="error">Please enter a keyword.</p>';
+        return;
+    }
+
+    resultsDiv.innerHTML = '<p>Searching tags...</p>';
+
+    try {
+        // Η λειτουργικότητα υλοποιείται μέσω POST request στέλνοντας το keyword σε JSON μορφή
+        const response = await fetch(`${API_BASE_URL}/tags/movies`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ search: keyword })
+        });
+
+        const data = await response.json();
+
+        // Έλεγχος επιστρεφόμενων δεδομένων
+        if (data.status !== 'success' || data.movies.length === 0) {
+            resultsDiv.innerHTML = '<p>No movies found matching this tag.</p>';
+            return;
+        }
+
+        // Το frontend εμφανίζει τις επιστρεφόμενες ταινίες σε μορφή πίνακα
+        let html = `
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Genres</th>
+                    <th>Matching Tag</th>
+                </tr>
+        `;
+
+        data.movies.forEach(movie => {
+            html += `
+                <tr>
+                    <td>${movie.movieId}</td>
+                    <td>${movie.title}</td>
+                    <td>${movie.genres}</td>
+                    <td><strong>${movie.matchingTag}</strong></td>
+                </tr>
+            `;
+        });
+
+        html += `</table>`;
+        resultsDiv.innerHTML = html;
+
+    } catch (error) {
+        resultsDiv.innerHTML = `<p class="error">Error fetching movies by tag.</p>`;
+    }
+});
+// ----------

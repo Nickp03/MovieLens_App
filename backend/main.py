@@ -34,6 +34,9 @@ class RatingInput(BaseModel):
 class RecommendationRequest(BaseModel):
     ratings: List[RatingInput]
 
+class TagSearchRequest(BaseModel):
+    search: str
+
 # --- API 1: Αναζήτηση Ταινιών (GET) ---
 @app.get("/movielens/api/movies")
 async def search_movies(search: str):
@@ -119,3 +122,45 @@ async def get_recommendations(req: RecommendationRequest):
         "status": "success", 
         "recommendations": recommendations
     }
+
+# ----------
+# --- API 5: Αναζήτηση Ταινιών βάσει Tag (POST) ---
+@app.post("/movielens/api/tags/movies")
+async def get_movies_by_tag(req: TagSearchRequest):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    keyword = req.search.lower()
+    
+    # Κανόνας αντιστοίχισης (case-insensitive)
+    if len(keyword) < 5:
+        # Αν το keyword έχει λιγότερους από 5 χαρακτήρες, γίνεται ακριβής ταύτιση
+        query = """
+            SELECT m.movieId, m.title, m.genres, MIN(t.tag) as matchingTag
+            FROM movies m
+            JOIN tags t ON m.movieId = t.movieId
+            WHERE LOWER(t.tag) = ?
+            GROUP BY m.movieId
+        """
+        cursor.execute(query, (keyword,))
+    else:
+        # Αν το keyword έχει τουλάχιστον 5 χαρακτήρες, ταυτίζονται οι πρώτοι 5 χαρακτήρες
+        prefix = keyword[:5]
+        query = """
+            SELECT m.movieId, m.title, m.genres, MIN(t.tag) as matchingTag
+            FROM movies m
+            JOIN tags t ON m.movieId = t.movieId
+            WHERE SUBSTR(LOWER(t.tag), 1, 5) = ?
+            GROUP BY m.movieId
+        """
+        cursor.execute(query, (prefix,))
+        
+    movies = cursor.fetchall()
+    conn.close()
+    
+    # Διαμόρφωση της απάντησης στην απαιτούμενη JSON μορφή
+    return {
+        "status": "success",
+        "movies": [{"movieId": m["movieId"], "title": m["title"], "genres": m["genres"], "matchingTag": m["matchingTag"]} for m in movies]
+    }
+# ----------

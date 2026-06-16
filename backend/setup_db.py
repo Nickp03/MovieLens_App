@@ -42,7 +42,6 @@ def create_database():
             movieId INTEGER,
             tag TEXT,
             timestamp INTEGER,
-            PRIMARY KEY (userId, movieId),
             FOREIGN KEY(movieId) REFERENCES movies(movieId)
         )
     ''')
